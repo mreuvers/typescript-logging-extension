@@ -1,0 +1,1 @@
+Files in this directory are special, they are specific for this extension. Things that are part of the react component MUST NOT be placed here.

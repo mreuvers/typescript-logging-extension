@@ -1,7 +1,6 @@
 import {ExtensionCategory} from "./ExtensionCategory";
 import {LogDataModel} from "./LogDataModel";
-import {ExtensionMessageJSON, LogLevel} from "typescript-logging";
-import {ExtensionLogMessageJSON} from "typescript-logging/dist/commonjs/json/ExtemsionLogMessageJSON";
+import {ExtensionCategoryLogMessageJSON} from "typescript-logging";
 
 export class ExtensionLogMessage {
 
@@ -38,7 +37,7 @@ export class ExtensionLogMessage {
     return this._categories;
   }
 
-  static createFromJSON(data: ExtensionLogMessageJSON, logDataModel: LogDataModel): ExtensionLogMessage {
+  static createFromJSON(data: ExtensionCategoryLogMessageJSON, logDataModel: LogDataModel): ExtensionLogMessage {
     const msg = new ExtensionLogMessage();
     msg._message = data.message;
     msg._errorAsStack = data.errorAsStack;

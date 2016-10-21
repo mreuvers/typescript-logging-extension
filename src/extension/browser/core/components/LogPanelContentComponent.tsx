@@ -13,7 +13,7 @@ export class LogPanelContentComponent extends React.Component<LogProps,{}> {
 
   render () {
     return (
-      <div id="logMessagesPanel">
+      <div id="logMessagesComponent">
         <h1>Log Panel</h1>
         <div id="logMessages">
           {

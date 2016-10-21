@@ -39,7 +39,7 @@ chrome.devtools.panels.create("Logging",
 
     extensionPanel.onShown.addListener(function tmp(panelWindow) {
       // Run once only
-      extensionPanel.onShown.removeListener(tmp);
+      //extensionPanel.onShown.removeListener(tmp);
 
       windowMainPanel = panelWindow;
 
@@ -48,7 +48,9 @@ chrome.devtools.panels.create("Logging",
         windowMainPanel.sendMessageToPanel(d);
       });
 
-      // Enable the integration by calling the framework.
+      // Enable the integration by calling the framework. Calling this more than once
+      // is no problem, but we would like to always get the current categories
+      // to make sure our react stuff shows accordingly.
       chrome.devtools.inspectedWindow.eval(
         "TSL.ExtensionHelper.enableExtensionIntegration();"
       );

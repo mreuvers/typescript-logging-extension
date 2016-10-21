@@ -5,19 +5,23 @@ import {ExtensionCategory} from "../api/ExtensionCategory";
 import {observer} from "mobx-react";
 import {ALL_LOG_LEVELS_CATEGORY} from "../api/ExtensionLogMessage";
 import {messageProcessor} from "../index";
-import {ExtensionMessageContentJSON, ExtensionMessageJSON, ExtensionRequestChangeLogLevel} from "typescript-logging";
+import {ExtensionMessageContentJSON, ExtensionMessageJSON, ExtensionRequestChangeLogLevelJSON} from "typescript-logging";
 
 @observer
-export class LogPanelTreeComponent extends React.Component<LogProps,{}> {
+export class LogPanelTreeComponent extends React.Component<LogProps,{applyRecursive: boolean}> {
 
   constructor(props: LogProps) {
     super(props);
+
+    this.state = {applyRecursive: true};
+
+    this.changeLogLevel = this.changeLogLevel.bind(this);
   }
 
   render() {
     return (
-      <div>
-
+      <div id="logPanelTreeComponent">
+        <span style={{verticalAlign: 'middle'}}>Recurse: <input value="Recurse" checked={this.state.applyRecursive} type="checkbox" onChange={() => this.changeRecursive()} /></span>
         {
           this.props.model.rootCategories.map((value: ExtensionCategory) => {
             return <ul><LogCategoryComponent category={value} changeLogLevel={this.changeLogLevel} /></ul>;
@@ -27,21 +31,27 @@ export class LogPanelTreeComponent extends React.Component<LogProps,{}> {
     );
   }
 
-  changeLogLevel(cat: ExtensionCategory, logLevel: string, recursive: boolean): void {
+  changeLogLevel(cat: ExtensionCategory, logLevel: string): void {
+    const currentState = this.state.applyRecursive;
     const content = {
       type: 'request-change-loglevel',
       value: {
         categoryId: cat.id,
         logLevel: logLevel,
-        recursive: recursive
+        recursive: currentState
       }
-    } as ExtensionMessageContentJSON<ExtensionRequestChangeLogLevel>;
+    } as ExtensionMessageContentJSON<ExtensionRequestChangeLogLevelJSON>;
     const msg = {
       from: 'tsl-extension',
       data: content
-    } as ExtensionMessageJSON<ExtensionRequestChangeLogLevel>;
+    } as ExtensionMessageJSON<ExtensionRequestChangeLogLevelJSON>;
 
     messageProcessor.sendMessageToLoggingFramework(msg);
+  }
+
+  private changeRecursive() {
+    this.setState({applyRecursive: !this.state.applyRecursive});
+    console.log("Current state=" + this.state.applyRecursive);
   }
 }
 
@@ -49,7 +59,7 @@ interface LogCategoryProps {
 
   category: ExtensionCategory;
 
-  changeLogLevel: (cat: ExtensionCategory, logLevel: string, recursive: boolean) => void;
+  changeLogLevel: (cat: ExtensionCategory, logLevel: string) => void;
 }
 
 @observer
@@ -82,7 +92,7 @@ class LogCategoryComponent extends React.Component<LogCategoryProps,{}> {
   }
 
   private onSelectLogLevel(e: React.FormEvent<HTMLSelectElement>): void {
-    this.props.changeLogLevel(this.props.category, e.currentTarget.value, true);
+    this.props.changeLogLevel(this.props.category, e.currentTarget.value);
   }
 
 }

@@ -1,3 +1,27 @@
+body {
+  font-family: Monospaced, Courier;
+  font-size: 8pt;
+  margin: 0;
+  padding: 0;
+}
+
+select, input {
+  font-family: Monospaced, Courier;
+  font-size: 8pt;
+}
+
+ul {
+  list-style: none;
+  margin: 1px;
+  padding: 0;
+}
+
+li {
+  list-style: none;
+  margin: 0;
+  padding-left: 5px;
+}
+
 .logFatal {
   color: darkred;
 }
@@ -27,11 +51,41 @@ div.errorStack {
   color: black;
 }
 
-div#logMessagesPanel {
-  font-family: Monospaced, Courier;
-  font-size: 9pt;
-  background-color: black;
+div#contentPanel {
+
 }
+
+div#logPanelComponent {
+  margin-bottom: 25px;
+}
+
+div#logPanelTreeComponent {
+  position: fixed;
+  top: 0;
+  margin-bottom: 25px;
+  width: 150px;
+}
+
+div#logMessagesComponent {
+  background-color: black;
+  position: relative;
+  top: 0;
+  left: 150px;
+  right: 1px;
+}
+
+div#logMessagesConsoleComponent {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 25px;
+  background-color: yellow;
+}
+
+div#logMessagesConsoleComponent > input {
+  width: 100%;
+}
+
 
 div#logMessages {
 }

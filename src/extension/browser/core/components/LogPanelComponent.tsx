@@ -3,6 +3,7 @@ import {LogDataModel} from "../api/LogDataModel";
 import {LogPanelConnector} from "../api/LogPanelConnector";
 import {LogPanelContentComponent} from "./LogPanelContentComponent";
 import {LogPanelTreeComponent} from "./LogPanelTreeComponent";
+import {LogPanelConsoleComponent} from "./LogPanelConsoleComponent";
 
 export interface LogProps {
 
@@ -18,9 +19,10 @@ class LogPanelComponent extends React.Component<LogProps,{}> {
 
   render () {
     return (
-      <div>
+      <div id="logPanelComponent">
         <LogPanelTreeComponent model={this.props.model} />
         <LogPanelContentComponent model={this.props.model}/>
+        <LogPanelConsoleComponent />
       </div>
     )
   }

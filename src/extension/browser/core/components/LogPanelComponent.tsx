@@ -4,12 +4,16 @@ import {LogPanelConnector} from "../api/LogPanelConnector";
 import {LogPanelContentComponent} from "./LogPanelContentComponent";
 import {LogPanelTreeComponent} from "./LogPanelTreeComponent";
 import {LogPanelConsoleComponent} from "./LogPanelConsoleComponent";
+import {Tuple} from "../api/Tuple";
+import {ALL_LOG_LEVELS_CATEGORY} from "../api/ExtensionLogMessage";
 
 export interface LogProps {
 
   model: LogDataModel;
 
 }
+
+
 
 class LogPanelComponent extends React.Component<LogProps,{}> {
 
@@ -18,10 +22,11 @@ class LogPanelComponent extends React.Component<LogProps,{}> {
   }
 
   render () {
+
     return (
       <div id="logPanelComponent">
         <LogPanelTreeComponent model={this.props.model} />
-        <LogPanelContentComponent model={this.props.model}/>
+        <LogPanelContentComponent model={this.props.model} />
         <LogPanelConsoleComponent />
       </div>
     )
@@ -29,6 +34,15 @@ class LogPanelComponent extends React.Component<LogProps,{}> {
 }
 
 const LogPanelComponentWrapper = () => {
+  const levels: Tuple<string,boolean>[] = [];
+
+  ALL_LOG_LEVELS_CATEGORY.forEach((level: string) => {
+    levels.push({x: level, y: true});
+  });
+
+  // Initiate the log levels to render (for selection)
+  LogPanelConnector.INSTANCE.dataModel.logLevelsSelected = levels;
+
   return (
     <LogPanelComponent model={LogPanelConnector.INSTANCE.dataModel} />
   );

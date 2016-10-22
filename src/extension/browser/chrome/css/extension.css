@@ -2,12 +2,19 @@ body {
   font-family: Monospaced, Courier;
   font-size: 8pt;
   margin: 0;
+  padding: 2px;
+}
+
+table, tbody, tr, td {
+  margin: 0;
   padding: 0;
 }
 
 select, input {
   font-family: Monospaced, Courier;
   font-size: 8pt;
+  margin: 0;
+  padding: 1px;
 }
 
 ul {
@@ -19,6 +26,7 @@ ul {
 li {
   list-style: none;
   margin: 0;
+  padding: 1px;
   padding-left: 5px;
 }
 
@@ -46,6 +54,10 @@ li {
   color: lightgreen;
 }
 
+.bold {
+  font-weight: bold;
+}
+
 div.errorStack {
   background-color: lightyellow;
   color: black;
@@ -59,19 +71,43 @@ div#logPanelComponent {
   margin-bottom: 25px;
 }
 
+/*  Wrapper for the content */
 div#logPanelTreeComponent {
+  position:absolute;
+  top:0;
+  left:0;
+  bottom: 25px;
+}
+
+div#logPanelTreeComponentContent {
   position: fixed;
-  top: 0;
-  margin-bottom: 25px;
-  width: 150px;
+  top:0;
+  left:0;
+  bottom:25px;
+  max-width: 200px;
+  overflow-y: scroll;
+  overflow-x: auto;
 }
 
 div#logMessagesComponent {
   background-color: black;
   position: relative;
   top: 0;
-  left: 150px;
-  right: 1px;
+  left: 200px;
+}
+
+div#logMessagesComponent div#logMessages {
+  margin-bottom: 50px;
+}
+
+
+div#logMessagesComponent div#logMessagesLevels {
+  background-color: white;
+  position: fixed;
+  left: 200px;
+  bottom: 25px;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 div#logMessagesConsoleComponent {
@@ -86,6 +122,3 @@ div#logMessagesConsoleComponent > input {
   width: 100%;
 }
 
-
-div#logMessages {
-}

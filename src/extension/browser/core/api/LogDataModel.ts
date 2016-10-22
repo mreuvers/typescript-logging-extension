@@ -2,6 +2,7 @@ import {ExtensionLogMessage} from "./ExtensionLogMessage";
 import {observable, action} from "mobx";
 import {ExtensionCategory} from "./ExtensionCategory";
 import {SimpleMap} from "typescript-logging";
+import {Tuple} from "./Tuple";
 
 
 export class LogDataModel {
@@ -14,6 +15,11 @@ export class LogDataModel {
 
   private _allCategories: SimpleMap<ExtensionCategory> = new SimpleMap<ExtensionCategory>();
 
+
+  // What log levels are enabled (checked)
+  @observable
+  private _logLevelsSelected: Tuple<string, boolean>[] = [];
+
   @action
   addMessage(msg: ExtensionLogMessage): void {
     this._messages.push(msg);
@@ -24,9 +30,12 @@ export class LogDataModel {
     if(root.parent != null) {
       throw new Error("Root category must not have a parent");
     }
-    this._rootCategories.push(root);
+    // Only add something we do not know yet.
+    if(!this._allCategories.exists(root.id.toString())) {
+      this._rootCategories.push(root);
 
-    this.addAllCategories(root);
+      this.addAllCategories(root);
+    }
   }
 
   get messages(): ExtensionLogMessage[] {
@@ -35,6 +44,14 @@ export class LogDataModel {
 
   get rootCategories(): ExtensionCategory[] {
     return this._rootCategories;
+  }
+
+  set logLevelsSelected(value: Tuple<string, boolean>[]) {
+    this._logLevelsSelected = value;
+  }
+
+  get logLevelsSelected(): Tuple<string, boolean>[] {
+    return this._logLevelsSelected;
   }
 
   getCategoryById(id: number): ExtensionCategory {

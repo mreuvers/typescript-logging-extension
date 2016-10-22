@@ -3,6 +3,7 @@ import * as React from "react";
 import {LogProps} from "./LogPanelComponent";
 import {ExtensionLogMessage} from "../api/ExtensionLogMessage";
 import {observer} from "mobx-react";
+import {Tuple} from "../api/Tuple";
 
 @observer
 export class LogPanelContentComponent extends React.Component<LogProps,{}> {
@@ -18,7 +19,7 @@ export class LogPanelContentComponent extends React.Component<LogProps,{}> {
         <div id="logMessages">
           {
             this.props.model.messages.filter((value : ExtensionLogMessage) => {
-              return true;
+              return this.mustShowMessage(value);
             })
             .map((value : ExtensionLogMessage) => {
               return (
@@ -27,8 +28,43 @@ export class LogPanelContentComponent extends React.Component<LogProps,{}> {
             })
           }
         </div>
+        <div id="logMessagesLevels">
+          <table>
+            <tbody>
+              <tr>
+          {this.props.model.logLevelsSelected.map((tuple: Tuple<string,boolean>) => {
+            return <td>{tuple.x}<input type="checkbox" checked={tuple.y} onChange={this.onChangeLogLevelChecked.bind(this, tuple.x)}/></td>
+          })}
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     );
+  }
+
+  private onChangeLogLevelChecked(level: string, evt?: React.FormEvent<HTMLInputElement>) {
+    const tupleFound = this.props.model.logLevelsSelected.filter((f: Tuple<string,boolean>) => {
+      return f.x === level;
+    });
+    if(tupleFound.length == 1) {
+      console.log(level + " switching from: " + tupleFound[0].y);
+      tupleFound[0].y = !tupleFound[0].y;
+      console.log(level + " switched to: " + tupleFound[0].y);
+    }
+    else {
+      throw new Error("Did not find log level " + level);
+    }
+  }
+
+
+  private mustShowMessage(value: ExtensionLogMessage): boolean {
+    const levelMatches = (level: string): boolean => {
+      return this.props.model.logLevelsSelected.some((tuple : Tuple<string,boolean>) => {
+        return tuple.y && tuple.x === level;
+      });
+    }
+    return levelMatches(value.logLevel);
   }
 }
 

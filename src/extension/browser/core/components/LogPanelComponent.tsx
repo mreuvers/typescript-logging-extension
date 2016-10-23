@@ -3,7 +3,6 @@ import {LogDataModel} from "../api/LogDataModel";
 import {LogPanelConnector} from "../api/LogPanelConnector";
 import {LogPanelContentComponent} from "./LogPanelContentComponent";
 import {LogPanelTreeComponent} from "./LogPanelTreeComponent";
-import {LogPanelConsoleComponent} from "./LogPanelConsoleComponent";
 import {Tuple} from "../api/Tuple";
 import {ALL_LOG_LEVELS_CATEGORY} from "../api/ExtensionLogMessage";
 
@@ -27,7 +26,6 @@ class LogPanelComponent extends React.Component<LogProps,{}> {
       <div id="logPanelComponent">
         <LogPanelTreeComponent model={this.props.model} />
         <LogPanelContentComponent model={this.props.model} />
-        <LogPanelConsoleComponent />
       </div>
     )
   }

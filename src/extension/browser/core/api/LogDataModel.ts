@@ -1,5 +1,5 @@
 import {ExtensionLogMessage} from "./ExtensionLogMessage";
-import {observable, action} from "mobx";
+import {observable, action, computed} from "mobx";
 import {ExtensionCategory} from "./ExtensionCategory";
 import {SimpleMap} from "typescript-logging";
 import {Tuple} from "./Tuple";
@@ -20,6 +20,10 @@ export class LogDataModel {
   @observable
   private _logLevelsSelected: Tuple<string, boolean>[] = [];
 
+  // Did the user filter on text?
+  @observable
+  private _filterText: string = null;
+
   @action
   addMessage(msg: ExtensionLogMessage): void {
     this._messages.push(msg);
@@ -38,8 +42,11 @@ export class LogDataModel {
     }
   }
 
+  @computed
   get messages(): ExtensionLogMessage[] {
-    return this._messages;
+    return this._messages.filter((msg: ExtensionLogMessage) => {
+      return this.mustShowMessage(msg);
+    });
   }
 
   get rootCategories(): ExtensionCategory[] {
@@ -58,10 +65,34 @@ export class LogDataModel {
     return this._allCategories.get(id.toString());
   }
 
+  get filterText():string {
+    return this._filterText;
+  }
+
+  set filterText(value: string) {
+    this._filterText = value;
+  }
+
   private addAllCategories(root: ExtensionCategory): void {
     this._allCategories.put(root.id.toString(), root);
     root.children.forEach((child : ExtensionCategory) => {
       this.addAllCategories(child);
     });
+  }
+
+  private mustShowMessage(value: ExtensionLogMessage): boolean {
+    const levelMatches = (level: string): boolean => {
+      return this._logLevelsSelected.some((tuple : Tuple<string,boolean>) => {
+        return tuple.y && tuple.x === level;
+      });
+    }
+
+    const filterMatch = (msg: string): boolean => {
+      if(this._filterText === null ||  this._filterText === '') {
+        return true;
+      }
+      return msg.indexOf(this._filterText) !== -1;
+    }
+    return levelMatches(value.logLevel) && filterMatch(value.message);
   }
 }

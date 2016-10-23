@@ -4,6 +4,7 @@ import {LogProps} from "./LogPanelComponent";
 import {ExtensionLogMessage} from "../api/ExtensionLogMessage";
 import {observer} from "mobx-react";
 import {Tuple} from "../api/Tuple";
+import {LogPanelConsoleComponent} from "./LogPanelConsoleComponent";
 
 @observer
 export class LogPanelContentComponent extends React.Component<LogProps,{}> {
@@ -18,10 +19,7 @@ export class LogPanelContentComponent extends React.Component<LogProps,{}> {
         <h1>Log Panel</h1>
         <div id="logMessages">
           {
-            this.props.model.messages.filter((value : ExtensionLogMessage) => {
-              return this.mustShowMessage(value);
-            })
-            .map((value : ExtensionLogMessage) => {
+            this.props.model.messages.map((value : ExtensionLogMessage) => {
               return (
                 <LogLineComponent value={value} />
               )
@@ -39,6 +37,7 @@ export class LogPanelContentComponent extends React.Component<LogProps,{}> {
             </tbody>
           </table>
         </div>
+        <LogPanelConsoleComponent model={this.props.model} />
       </div>
     );
   }
@@ -48,23 +47,11 @@ export class LogPanelContentComponent extends React.Component<LogProps,{}> {
       return f.x === level;
     });
     if(tupleFound.length == 1) {
-      console.log(level + " switching from: " + tupleFound[0].y);
       tupleFound[0].y = !tupleFound[0].y;
-      console.log(level + " switched to: " + tupleFound[0].y);
     }
     else {
       throw new Error("Did not find log level " + level);
     }
-  }
-
-
-  private mustShowMessage(value: ExtensionLogMessage): boolean {
-    const levelMatches = (level: string): boolean => {
-      return this.props.model.logLevelsSelected.some((tuple : Tuple<string,boolean>) => {
-        return tuple.y && tuple.x === level;
-      });
-    }
-    return levelMatches(value.logLevel);
   }
 }
 

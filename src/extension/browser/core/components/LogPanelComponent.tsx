@@ -12,8 +12,6 @@ export interface LogProps {
 
 }
 
-
-
 class LogPanelComponent extends React.Component<LogProps,{}> {
 
   constructor(props: LogProps) {
@@ -21,7 +19,6 @@ class LogPanelComponent extends React.Component<LogProps,{}> {
   }
 
   render () {
-
     return (
       <div id="logPanelComponent">
         <LogPanelTreeComponent model={this.props.model} />
@@ -39,7 +36,7 @@ const LogPanelComponentWrapper = () => {
   });
 
   // Initiate the log levels to render (for selection)
-  LogPanelConnector.INSTANCE.dataModel.logLevelsSelected = levels;
+  LogPanelConnector.INSTANCE.dataModel.uiSettings.logLevelsSelected = levels;
 
   return (
     <LogPanelComponent model={LogPanelConnector.INSTANCE.dataModel} />

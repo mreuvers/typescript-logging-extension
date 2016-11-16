@@ -50,7 +50,7 @@ export class ExtensionLogMessage {
       if(category != null) {
         msg._categories.push(category);
       }
-    })
+    });
 
     return msg;
   }

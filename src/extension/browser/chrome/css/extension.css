@@ -84,7 +84,7 @@ div#logPanelTreeComponentContent {
   top: 0;
   left: 0;
   bottom: 0;
-  max-width: 200px;
+  width: 200px;
   overflow-y: scroll;
   overflow-x: auto;
 }

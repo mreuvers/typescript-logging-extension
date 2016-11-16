@@ -5,8 +5,10 @@ import {ExtensionCategory} from "../api/ExtensionCategory";
 import {observer} from "mobx-react";
 import {messageProcessor} from "../index";
 import {ExtensionMessageContentJSON, ExtensionMessageJSON, ExtensionRequestChangeLogLevelJSON} from "typescript-logging";
-import {Tuple} from "../api/Tuple";
 import {ALL_LOG_LEVELS_CATEGORY} from "../api/ExtensionLogMessage";
+import {Tabs, TabList, Tab, TabPanel} from "react-tabs";
+import {Debounce} from "../util/Debounce";
+import {Numeric} from "../util/Numeric";
 
 interface LogPanelTreeComponentState {
 
@@ -30,13 +32,33 @@ export class LogPanelTreeComponent extends React.Component<LogProps,LogPanelTree
     return (
       <div id="logPanelTreeComponent">
         <div id="logPanelTreeComponentContent">
-          <div className="bold" style={{paddingTop: '3px'}}>Categories</div>
-          <div style={{verticalAlign: 'middle'}}>Recurse <input value="Recurse" checked={this.state.applyRecursive} type="checkbox" onChange={() => this.changeRecursive()} /></div>
-          {
-            this.props.model.rootCategories.map((value: ExtensionCategory) => {
-              return <ul><LogCategoryComponent category={value} changeLogLevel={this.changeLogLevel} /></ul>;
-            })
-          }
+          <Tabs>
+            <TabList>
+              <Tab>Categories</Tab>
+              <Tab>Settings</Tab>
+            </TabList>
+            <TabPanel>
+              <div style={{verticalAlign: 'middle'}}>Recurse <input value="Recurse" checked={this.state.applyRecursive} type="checkbox" onChange={() => this.changeRecursive()} /></div>
+              {
+                this.props.model.rootCategories.map((value: ExtensionCategory) => {
+                  return <ul><LogCategoryComponent category={value} changeLogLevel={this.changeLogLevel} /></ul>;
+                })
+              }
+            </TabPanel>
+            <TabPanel>
+              <table>
+                <tbody>
+                  <tr>
+                    <td>Lines cached</td>
+                    <td><input type="text" size={6} maxLength={6} value={this.props.model.uiSettings.requestedLines} onChange={(e) => this.changeLines(e)} /></td>
+                  </tr>
+                </tbody>
+              </table>
+            </TabPanel>
+          </Tabs>
+
+
+
         </div>
       </div>
     );
@@ -60,20 +82,15 @@ export class LogPanelTreeComponent extends React.Component<LogProps,LogPanelTree
     messageProcessor.sendMessageToLoggingFramework(msg);
   }
 
-  private onChangeLogLevelChecked(level: string, evt?: React.FormEvent<HTMLInputElement>) {
-    const tupleFound = this.props.model.logLevelsSelected.filter((f: Tuple<string,boolean>) => {
-      return f.x === level;
-    });
-    if(tupleFound.length == 1) {
-      console.log(level + " switching from: " + tupleFound[0].y);
-      tupleFound[0].y = !tupleFound[0].y;
-      console.log(level + " switched to: " + tupleFound[0].y);
+  private changeLines(evt: React.FormEvent<HTMLInputElement>): void {
+    const value = evt.currentTarget.value;
+    if(Numeric.isInt(value)) {
+      this.props.model.uiSettings.requestedLines = parseInt(value);
     }
-    else {
-      throw new Error("Did not find log level " + level);
+    else if(value === "") {
+      this.props.model.uiSettings.requestedLines = null;
     }
   }
-
 
   private changeRecursive() {
     this.setState({applyRecursive: !this.state.applyRecursive});

@@ -49,10 +49,9 @@ export class LogDataModel {
   @computed
   get messages(): ExtensionLogMessage[] {
     if(this._messageChanged > 0) {
-      const result = this._messages.filter((msg: ExtensionLogMessage) => {
+      return this._messages.filter((msg: ExtensionLogMessage) => {
         return this._uiSettings.mustShowMessage(msg);
       });
-      return result;
     }
     return [];
   }

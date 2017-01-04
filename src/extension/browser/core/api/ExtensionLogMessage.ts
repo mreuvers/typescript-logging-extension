@@ -8,7 +8,7 @@ export class ExtensionLogMessage {
   private _message: string = null;
   private _formattedMessage: string = null;
 
-  private _errorAsStack: string = null;
+  private _errorAsStack: string[] = null;
   private _resolvedErrorMessage: boolean = false;
 
   private _categories: ExtensionCategory[] = [];
@@ -21,11 +21,11 @@ export class ExtensionLogMessage {
     return this._message;
   }
 
-  get formattedMessage(): any {
+  get formattedMessage(): string {
     return this._formattedMessage;
   }
 
-  get errorAsStack(): any {
+  get errorAsStack(): string[] {
     return this._errorAsStack;
   }
 
@@ -40,7 +40,10 @@ export class ExtensionLogMessage {
   static createFromJSON(data: ExtensionCategoryLogMessageJSON, logDataModel: LogDataModel): ExtensionLogMessage {
     const msg = new ExtensionLogMessage();
     msg._message = data.message;
-    msg._errorAsStack = data.errorAsStack;
+    if(data.errorAsStack) {
+      const value = data.errorAsStack as string;
+      msg._errorAsStack = value.split('\n');
+    }
     msg._formattedMessage = data.formattedMessage;
     msg._logLevel = data.logLevel;
     msg._resolvedErrorMessage = data.resolvedErrorMessage;

@@ -84,6 +84,11 @@ export class LogDataModel {
     }
   }
 
+  getSelectedLogLinesAsBlob(): Blob {
+    return new Blob(["hello"], {type: 'text/plain'});
+  }
+
+
   private addAllCategories(root: ExtensionCategory): void {
     this._allCategories.put(root.id.toString(), root);
     root.children.forEach((child : ExtensionCategory) => {

@@ -7,7 +7,6 @@ import {messageProcessor} from "../index";
 import {ExtensionMessageContentJSON, ExtensionMessageJSON, ExtensionRequestChangeLogLevelJSON} from "typescript-logging";
 import {ALL_LOG_LEVELS_CATEGORY} from "../api/ExtensionLogMessage";
 import {Tabs, TabList, Tab, TabPanel} from "react-tabs";
-import {Debounce} from "../util/Debounce";
 import {Numeric} from "../util/Numeric";
 
 interface LogPanelTreeComponentState {
@@ -33,7 +32,7 @@ export class LogPanelTreeComponent extends React.Component<LogProps,LogPanelTree
       <div id="logPanelTreeComponent">
         <div id="logPanelTreeComponentContent">
           <Tabs>
-            <TabList>
+            <TabList className="tabs">
               <Tab>Categories</Tab>
               <Tab>Settings</Tab>
             </TabList>

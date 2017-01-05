@@ -42,7 +42,7 @@ export class LogPanelContentComponent extends React.Component<LogProps,{}> {
           })}
                 <td>
                   &nbsp;&nbsp;&nbsp;Autoscroll bottom <input type="checkbox" checked={this.props.model.uiSettings.scrollToBottom} onChange={() => this.props.model.uiSettings.scrollToBottom = !this.props.model.uiSettings.scrollToBottom} />
-                  <span style={{marginLeft: 20}}><button style={{marginBottom: 3}} onClick={this.onSaveLog.bind(this)}>Save log...</button></span>
+                  <span style={{marginLeft: 20}}><button style={{marginBottom: 5}} onClick={this.onSaveLog.bind(this)}>Save log...</button></span>
                 </td>
               </tr>
             </tbody>
@@ -84,7 +84,7 @@ export class LogPanelContentComponent extends React.Component<LogProps,{}> {
 
     // wait for the link to be added to the document
     window.requestAnimationFrame(function () {
-      var event = new MouseEvent('click');
+      const event = new MouseEvent('click');
       link.dispatchEvent(event);
       document.body.removeChild(link);
     });

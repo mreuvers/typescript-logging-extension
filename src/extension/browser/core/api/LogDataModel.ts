@@ -85,7 +85,19 @@ export class LogDataModel {
   }
 
   getSelectedLogLinesAsBlob(): Blob {
-    return new Blob(["hello"], {type: 'text/plain'});
+    const data: string[] = [];
+
+    this.messages.forEach((msg) => {
+      let line: string = msg.formattedMessage;
+      const errorAsStack = msg.errorAsStack;
+      if(errorAsStack != null) {
+        line += "\n" + errorAsStack.join("\n") + "\n";
+      }
+      line += "\n";
+      data.push(line);
+    });
+
+    return new Blob(data, {type: 'text/plain'});
   }
 
 

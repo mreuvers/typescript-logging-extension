@@ -6,8 +6,13 @@ for details on that project visit the page.
 
 ## Installation
 
-Start Chrome and visit the [Chrome web store](https://chrome.google.com/webstore/category/extensions) and find the extension by name: typescript-logging-extension.
+Start Chrome and visit the [Chrome web store](https://chrome.google.com/webstore/category/extensions) and find the extension by name: Typescript Logging Developer Extension.
 Once installed, the next time you open the developer console a new tab "Logging" will be available. If the application on the website you visit uses typescript-logging
 it will contain the relevant logging options.
 
-![Image of Yaktocat](img/typescript-logging-tab.png)
+![Extension screenshot](img/typescript-logging-tab.png)
+
+Please note when opening an application locally by direct file (e.g. using file:///home/user/someurl.html) you need to allow "url access" for the extension. This is only necessary if locally testing by a direct file (and not a normal URL).
+If so:
+* In the browser type: chrome://extensions
+* Find the extension, and check "Allow access to file urls".

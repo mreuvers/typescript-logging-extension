@@ -1,28 +1,29 @@
 var windowMainPanel = null;
+var registered = false;
 
 chrome.devtools.panels.create("Logging",
   "images/icon.png",
   "panel.html",
-  function(extensionPanel) {
+  function (extensionPanel) {
 
 
     var data = [];
     var port = chrome.runtime.connect({name: 'devtools'});
 
-
     port.onMessage.addListener(function (message) {
 
-      if(message.from) {
+      if (message.from) {
         switch (message.from) {
           // From tsl-extension (us), must be send to the logger framework.
           case 'tsl-extension':
+            var evalValue = 'window.postMessage(' + JSON.stringify(message) + ', "*");';
             chrome.devtools.inspectedWindow.eval(
-              "TSL.ExtensionHelper.processMessageFromExtension(" + JSON.stringify(message) + ");"
+              evalValue
             );
             break;
           case 'tsl-logging':
             // From the logging framework, send to panel (or store)
-            if(windowMainPanel != null) {
+            if (windowMainPanel != null) {
               windowMainPanel.sendMessageToPanel(message);
             }
             else {
@@ -30,7 +31,7 @@ chrome.devtools.panels.create("Logging",
             }
             break;
           default:
-            console.log("devtools (port.onMessage): Unknown message (from) " + message.from);
+            console.log("devtools (port.onMessage): Unknown message, dropping - from=" + message.from);
             break;
         }
       }
@@ -38,31 +39,40 @@ chrome.devtools.panels.create("Logging",
 
 
     extensionPanel.onShown.addListener(function tmp(panelWindow) {
-      // Run once only
-      //extensionPanel.onShown.removeListener(tmp);
-
       windowMainPanel = panelWindow;
 
+      // Run once only
+      extensionPanel.onShown.removeListener(tmp);
+
       // Release queued data to send to panel (if any)
-      data.forEach(function(d) {
+      data.forEach(function (d) {
         windowMainPanel.sendMessageToPanel(d);
       });
 
-      // Enable the integration by calling the framework. Calling this more than once
-      // is no problem, but we would like to always get the current categories
-      // to make sure our react stuff shows accordingly.
-      chrome.devtools.inspectedWindow.eval(
-        "TSL.ExtensionHelper.enableExtensionIntegration();"
-      );
+      // Enable the integration by calling the framework.
+      if (!registered) {
+        var evalValue = 'window.postMessage(' + JSON.stringify({
+            from: "tsl-extension",
+            data: {type: "register", value: null}
+          }) + ', "*");';
+        console.log("Will evaluate: " + evalValue);
+        chrome.devtools.inspectedWindow.eval(
+          evalValue
+        );
+        registered = true;
+      }
+      else {
+        console.log("Already registered previously");
+      }
     });
   }
 );
 
 // To receive messages from content script (which gets it from the inspected page), so it must always be tsl-logging messaging us!
-chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
-  if(message.from) {
-    switch(message.from) {
+  if (message.from) {
+    switch (message.from) {
       case 'tsl-logging':
         // Send to panel (it's from the framework)
         windowMainPanel.sendMessageToPanel(message);

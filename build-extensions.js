@@ -2,7 +2,6 @@ const shell = require('shelljs');
 
 const dirInput='src/extension/browser';
 const dirOutput='dist/extension/browser';
-const logBundle='./node_modules/typescript-logging/dist/bundle/typescript-logging-bundle.js';
 
 // Chrome extension dirs
 const dirOutputChrome = dirOutput + '/chrome';
@@ -18,9 +17,4 @@ shell.mkdir('-p', dirOutputChrome);
 // Yes dirOutput, chrome subdir will be created.
 shell.cp('-R', dirInputChrome, dirOutput);
 
-// Grab the logger bundle, non minified, since it's an extension anyway we ship it readable - that allows for more easily debugging if needed.
-shell.cp(logBundle, dirOutputChrome + '/js/typescript-logging-bundle.js');
-
 console.log("Extension built.");
-
-

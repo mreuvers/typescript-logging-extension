@@ -1,6 +1,6 @@
 {
   "name": "typescript-logging-extension",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Supportive project for typescript-logging, adding browser extension",
   "main": "dist",
   "scripts": {

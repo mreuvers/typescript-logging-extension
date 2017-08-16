@@ -51,6 +51,10 @@ export class LogPanelTreeComponent extends React.Component<LogProps,LogPanelTree
                     <td>Lines cached</td>
                     <td><input type="text" size={6} maxLength={6} value={this.props.model.uiSettings.requestedLines} onChange={(e) => this.changeLines(e)} /></td>
                   </tr>
+                  <tr>
+                    <td>Clear messages (f5)</td>
+                    <td><input type="checkbox" checked={this.props.model.uiSettings.clearMessages} onChange={this.toggleClearMessages.bind(this)} /></td>
+                  </tr>
                 </tbody>
               </table>
             </TabPanel>
@@ -79,6 +83,10 @@ export class LogPanelTreeComponent extends React.Component<LogProps,LogPanelTree
     } as ExtensionMessageJSON<ExtensionRequestChangeLogLevelJSON>;
 
     messageProcessor.sendMessageToLoggingFramework(msg);
+  }
+
+  private toggleClearMessages() {
+    this.props.model.uiSettings.clearMessages = !this.props.model.uiSettings.clearMessages;
   }
 
   private changeLines(evt: React.FormEvent<HTMLInputElement>): void {

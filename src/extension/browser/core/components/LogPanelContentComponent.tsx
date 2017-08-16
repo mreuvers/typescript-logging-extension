@@ -42,7 +42,10 @@ export class LogPanelContentComponent extends React.Component<LogProps,{}> {
           })}
                 <td>
                   &nbsp;&nbsp;&nbsp;Autoscroll bottom <input type="checkbox" checked={this.props.model.uiSettings.scrollToBottom} onChange={() => this.props.model.uiSettings.scrollToBottom = !this.props.model.uiSettings.scrollToBottom} />
-                  <span style={{marginLeft: 20}}><button style={{marginBottom: 5}} onClick={this.onSaveLog.bind(this)}>Save log...</button></span>
+                  <span style={{marginLeft: 20}}>
+                    <button style={{marginBottom: 5, marginRight: 5}} onClick={() => this.props.model.trimMessages(0)}>Clear</button>
+                    <button style={{marginBottom: 5}} onClick={this.onSaveLog.bind(this)}>Save log...</button>
+                  </span>
                 </td>
               </tr>
             </tbody>

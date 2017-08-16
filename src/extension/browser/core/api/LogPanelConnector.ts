@@ -23,6 +23,18 @@ export class LogPanelConnector {
     return this._dataModel.getCategoryById(id);
   }
 
+  clear(): void {
+    this._dataModel.clear();
+  }
+
+  saveCategoryStateAndClear(): void {
+    this._dataModel.saveCategoryStateAndClear();
+  }
+
+  restoreCategoryState(): void {
+    this._dataModel.restoreCategoryState();
+  }
+
   get dataModel(): LogDataModel {
     return this._dataModel;
   }

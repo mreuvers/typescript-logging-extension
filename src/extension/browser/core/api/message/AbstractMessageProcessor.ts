@@ -15,6 +15,9 @@ export abstract class AbstractMessageProcessor implements MessageProcessor {
         case 'tsl-logging':
           this.processMessageFromLoggingFramework(msg.data);
           break;
+        case 'tsl-devtools':
+          this.processMessageFromDevTools(msg.data);
+          break;
         default:
           console.log("Dropped non supported msg.from=" + msg.from);
           break;
@@ -52,6 +55,20 @@ export abstract class AbstractMessageProcessor implements MessageProcessor {
         break;
       default:
         throw new Error("Unsupported message type: " + content.type)
+    }
+  }
+
+  private processMessageFromDevTools(content: ExtensionMessageContentJSON<any>) {
+    switch(content.type) {
+      case "clear":
+        LogPanelConnector.INSTANCE.clear();
+        break;
+      case "saveCategoryStateAndClear":
+        LogPanelConnector.INSTANCE.saveCategoryStateAndClear();
+        break;
+      case "restoreState":
+        LogPanelConnector.INSTANCE.restoreCategoryState();
+        break;
     }
   }
 }

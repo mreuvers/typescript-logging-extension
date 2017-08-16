@@ -32,6 +32,11 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   notifyDevtools(message);
 });
 
+
+chrome.webNavigation.onDOMContentLoaded.addListener(function(data) {
+  notifyDevtools({from : "chrome-extension-background"}); // Since we only have one message so far, just use a simple from.
+});
+
 // Function to send a message to devtools views.
 function notifyDevtools(msg) {
   ports.forEach(function(port) {

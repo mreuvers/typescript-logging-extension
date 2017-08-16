@@ -4,7 +4,7 @@ This project is a browser extension, currently for Chrome only, to add a logging
 The extension allows to easily change logging levels dynamically and (text) filtering. Your application should use [typescript-logging](https://github.com/mreuvers/typescript-logging) (at least version 0.2.0-beta6)
 in order for the extension to be useful, for details on that project visit the page.
 
-Supports categorized style of logging from typescript-logging, in the future will support the log4j style of logging as well.
+Supports categorized style of logging from typescript-logging, in the future may support the log4j style of logging as well.
 
 ## Installation
 
@@ -23,7 +23,12 @@ If so:
 * Find the extension, and check "Allow access to file urls".
 
 ## History
-* 0.2.0 (current release)
+* 0.3.0 (current release)
+  * Compatible with typescript logging 0.2.0-beta6 and newer.
+  * Added clear button to clear messages
+  * On page refresh (f5), restore communication with logger framework so extension remains working, try to restore previous category loglevels as well if possible.
+  * Additional setting to either clear or not clear messages on page refresh (default is keep)
+* 0.2.0
   * Compatible with typescript-logging 0.2.0-beta6 and newer.
 * 0.1.0
   * Initial release compatible with typescript-logging 0.2.0-beta1 up to 0.2.0-beta5.

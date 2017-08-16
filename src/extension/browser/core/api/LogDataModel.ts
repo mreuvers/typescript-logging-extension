@@ -1,8 +1,12 @@
 import {ExtensionLogMessage} from "./ExtensionLogMessage";
 import {observable, action, computed, transaction} from "mobx";
 import {ExtensionCategory} from "./ExtensionCategory";
-import {SimpleMap, LinkedList} from "typescript-logging";
+import {
+  SimpleMap, LinkedList, ExtensionMessageContentJSON,
+  ExtensionRequestChangeLogLevelJSON, ExtensionMessageJSON
+} from "typescript-logging";
 import {Tuple} from "./Tuple";
+import {messageProcessor} from "../index";
 
 
 export class LogDataModel {
@@ -46,6 +50,22 @@ export class LogDataModel {
     }
   }
 
+  @action
+  saveCategoryStateAndClear(): void {
+    this._uiSettings.saveCategoryState(this._allCategories);
+    this.clear();
+  }
+
+  @action
+  clear(): void {
+    this._allCategories = new SimpleMap<ExtensionCategory>();
+    this._rootCategories = [];
+    if(this._uiSettings.clearMessages) {
+      this._messages.clear();
+      this._messageChanged = 0;
+    }
+  }
+
   @computed
   get messages(): ExtensionLogMessage[] {
     if(this._messageChanged > 0) {
@@ -54,6 +74,13 @@ export class LogDataModel {
       });
     }
     return [];
+  }
+
+  /**
+   * Sends requested category state to the logger framework (if any was stored).
+   */
+  restoreCategoryState(): void {
+    this._uiSettings.restoreCategoryState();
   }
 
   get rootCategories(): ExtensionCategory[] {
@@ -112,11 +139,9 @@ export class LogDataModel {
 
 export class UISettings {
 
-  private model: LogDataModel;
+  private _model: LogDataModel;
 
-  constructor(model: LogDataModel) {
-    this.model = model;
-  }
+  private _restorationState: CategoryState[] = [];
 
 // What log levels are enabled (checked)
   @observable
@@ -131,6 +156,13 @@ export class UISettings {
 
   @observable
   private _requestedLines: number = 5000;
+
+  @observable
+  private _clearMessages: boolean = false; // When true existing messages are cleared in the clear of the model, false otherwise.
+
+  constructor(model: LogDataModel) {
+    this._model = model;
+  }
 
   set logLevelsSelected(value: Tuple<string, boolean>[]) {
     this._logLevelsSelected = value;
@@ -163,8 +195,16 @@ export class UISettings {
   set requestedLines(value: number) {
     if(value !== this._requestedLines) {
       this._requestedLines = value;
-      this.model.trimMessages(value);
+      this._model.trimMessages(value);
     }
+  }
+
+  get clearMessages(): boolean {
+    return this._clearMessages;
+  }
+
+  set clearMessages(value: boolean) {
+    this._clearMessages = value;
   }
 
   mustShowMessage(value: ExtensionLogMessage): boolean {
@@ -183,4 +223,34 @@ export class UISettings {
     return levelMatches(value.logLevel) && filterMatch(value.message);
   }
 
+  saveCategoryState(map: SimpleMap<ExtensionCategory>): void {
+    this._restorationState = [];
+
+    map.values().forEach((value) => this._restorationState.push({id: value.id, logLevel: value.logLevel}));
+  }
+
+  restoreCategoryState(): void {
+    this._restorationState.forEach(cat => {
+      const content = {
+        type: 'request-change-loglevel',
+        value: {
+          categoryId: cat.id,
+          logLevel: cat.logLevel,
+          recursive: false
+        }
+      } as ExtensionMessageContentJSON<ExtensionRequestChangeLogLevelJSON>;
+      const msg = {
+        from: 'tsl-extension',
+        data: content
+      } as ExtensionMessageJSON<ExtensionRequestChangeLogLevelJSON>;
+
+      messageProcessor.sendMessageToLoggingFramework(msg);
+    });
+  }
+
+}
+
+interface CategoryState {
+  id: number;
+  logLevel: string;
 }

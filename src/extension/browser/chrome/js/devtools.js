@@ -1,5 +1,25 @@
+var evalValueRegister = 'window.postMessage(' + JSON.stringify({
+  from: "tsl-extension",
+  data: {type: "register", value: null}
+}) + ', "*");';
+
 var windowMainPanel = null;
 var registered = false;
+var hidden = true;
+
+var currentURL;
+var lastKnownURL = null;
+
+function setCurrentURL(fn) {
+  chrome.devtools.inspectedWindow.eval(
+    "window.location.href", function(result) {
+      currentURL = result;
+      if(fn != null) {
+        fn(currentURL);
+      }
+    }
+  );
+}
 
 chrome.devtools.panels.create("Logging",
   "images/icon.png",
@@ -23,11 +43,40 @@ chrome.devtools.panels.create("Logging",
             break;
           case 'tsl-logging':
             // From the logging framework, send to panel (or store)
-            if (windowMainPanel != null) {
+            if (windowMainPanel !== null) {
               windowMainPanel.sendMessageToPanel(message);
             }
             else {
               data.push(message);
+            }
+            break;
+          case 'chrome-extension-background': // special from background page, register again.
+            if (!hidden) {
+              var callback = function() {
+                var restoreState = false;
+
+                // Still same url we know, that means we can try reusing the current category settings.
+                if(currentURL !== null && lastKnownURL !== null && currentURL === lastKnownURL) {
+                  restoreState = true;
+                  windowMainPanel.sendMessageToPanel({from: "tsl-devtools", data: {type: "saveCategoryStateAndClear" }});
+                }
+                else {
+                  windowMainPanel.sendMessageToPanel({from: "tsl-devtools", data: {type: "clear" }});
+                }
+                lastKnownURL = currentURL;
+
+                console.log("Not hidden, will evaluate: " + evalValueRegister);
+
+                chrome.devtools.inspectedWindow.eval(
+                  evalValueRegister
+                );
+
+                // Now restore state if any
+                if(restoreState) {
+                  windowMainPanel.sendMessageToPanel({from: "tsl-devtools", data: {type : "restoreState"}});
+                }
+              };
+              setCurrentURL(callback);
             }
             break;
           default:
@@ -38,26 +87,25 @@ chrome.devtools.panels.create("Logging",
     });
 
 
-    extensionPanel.onShown.addListener(function tmp(panelWindow) {
+    extensionPanel.onShown.addListener(function (panelWindow) {
+      hidden = false;
       windowMainPanel = panelWindow;
-
-      // Run once only
-      extensionPanel.onShown.removeListener(tmp);
 
       // Release queued data to send to panel (if any)
       data.forEach(function (d) {
         windowMainPanel.sendMessageToPanel(d);
       });
 
+      setCurrentURL(function(newUrl) {
+        lastKnownURL = newUrl;
+      });
+
       // Enable the integration by calling the framework.
       if (!registered) {
-        var evalValue = 'window.postMessage(' + JSON.stringify({
-            from: "tsl-extension",
-            data: {type: "register", value: null}
-          }) + ', "*");';
-        console.log("Will evaluate: " + evalValue);
+        console.log("Will evaluate: " + evalValueRegister);
+
         chrome.devtools.inspectedWindow.eval(
-          evalValue
+          evalValueRegister
         );
         registered = true;
       }
@@ -65,8 +113,13 @@ chrome.devtools.panels.create("Logging",
         console.log("Already registered previously");
       }
     });
+
+    extensionPanel.onHidden.addListener(function(panelWindow) {
+      hidden = true;
+    });
   }
 );
+
 
 // To receive messages from content script (which gets it from the inspected page), so it must always be tsl-logging messaging us!
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
